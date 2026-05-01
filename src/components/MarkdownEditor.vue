@@ -1,23 +1,38 @@
 <script setup lang="ts">
 import { VueMarkdownIt } from '@f3ve/vue-markdown-it'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { BTooltip } from 'buefy'
+import type { MdFileData } from '@/types.ts'
+import debounce from 'buefy/src/utils/debounce.ts'
+import { useUpdateMdFile } from '@/composables/useSupabse.ts'
 
-const showEditor = ref(false)
+defineEmits(['update:modelValue'])
+const props = defineProps<{ selectedMdFile: MdFileData }>()
 
-const noteData = ref({
-  id: 1,
-  content: '# Hello World',
-})
+const showEditor = ref<boolean>(false)
+const mdFileData = ref<MdFileData>()
 
 const markdownWidth = computed(() => (showEditor.value ? '50%' : '100%'))
-const computedFloatButtonText = computed(() => showEditor.value ? 'Ocultar editor' : 'Mostrar editor')
+const computedFloatButtonText = computed(() =>
+  showEditor.value ? 'Ocultar editor' : 'Mostrar editor',
+)
+
+const update = debounce(() => {
+  useUpdateMdFile(mdFileData.value!.content, mdFileData.value!.id)
+}, 1000)
+
+watch(() => props.selectedMdFile, () => (mdFileData.value = props.selectedMdFile))
 </script>
 
 <template>
   <div class="markdown-container">
-    <textarea v-if="showEditor" class="markdown-editor" v-model="noteData.content" />
-    <div class="markdown"><VueMarkdownIt :source="noteData.content" /></div>
+    <textarea
+      v-if="showEditor"
+      @input="update"
+      class="markdown-editor"
+      v-model="mdFileData!.content"
+    />
+    <div v-if="mdFileData" class="markdown"><VueMarkdownIt :source="mdFileData.content" /></div>
     <b-tooltip position="is-left" class="float-button" :label="computedFloatButtonText">
       <b-button @click="showEditor = !showEditor" rounded type="is-dark">
         <b-icon type="is-success" icon="eye"></b-icon>
@@ -43,7 +58,7 @@ const computedFloatButtonText = computed(() => showEditor.value ? 'Ocultar edito
   }
   .markdown {
     padding: 12px;
-    width:v-bind(markdownWidth);
+    width: v-bind(markdownWidth);
   }
   .float-button {
     position: absolute;
