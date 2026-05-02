@@ -22,6 +22,16 @@ export async function logoutUser() {
   return Promise.resolve()
 }
 
+export async function useCreateNewMdFileSupabase(newMdFileData: MdFileData) {
+  const {id, ...rest} = newMdFileData
+  const { data, error } = await supabase
+    .from('md')
+    .insert([rest])
+    .select()
+  if (error) return Promise.reject(error.message)
+  return Promise.resolve()
+}
+
 export function useGetMdFile(userId: string) {
   const mdFileList = ref<MdFileData[]>([])
   async function getMdFile(userId: string) {

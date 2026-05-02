@@ -26,5 +26,5 @@ export type MdFileData = {
   id: number,
   title: string,
   extra?: string | null | undefined,
-  userOwnerId: string,
+  user_owner_id: string,
 }

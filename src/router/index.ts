@@ -10,6 +10,7 @@ const router = createRouter({
       path: '/',
       name: 'Login',
       component: LoginView,
+      meta: { requireAuth: false },
     },
     {
       path: '/md-file-viewer/:mdFileId?',
@@ -23,9 +24,10 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const userStore = authStore()
   const isLoggedIn = userStore.getUserIsLogged
-  const requiresAuth = to.matched.some((record) => record.meta.requiresAuth)
+  const requiresAuth = to.matched.some((record) => record.meta.requireAuth)
   if (requiresAuth && !isLoggedIn) {
-    next({ name: 'Login' })
+    console.log('requiresAuth', requiresAuth)
+     next({ name: 'Login' })
   } else if (to.name === 'Login' && isLoggedIn) {
     next({ name: 'MdFileViewer' })
   }

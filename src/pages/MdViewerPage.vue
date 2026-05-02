@@ -2,15 +2,18 @@
 import MarkdownEditor from '@/components/MarkdownEditor.vue'
 import authStore from '@/stores/userStore.ts'
 import router from '@/router'
-import { logoutUser, useGetMdFile } from '@/composables/useSupabse.ts'
+import { logoutUser, useCreateNewMdFileSupabase, useGetMdFile } from '@/composables/useSupabse.ts'
 import { ref } from 'vue'
 import type { MdFileData } from '@/types.ts'
+import { useToast } from 'buefy'
 
+const Toast = useToast()
 const store = authStore()
+const showSpinner = ref<boolean>(false)
 const showCreateModal = ref<boolean>(false)
 const newMdTitle = ref<string>('Nuova nota')
-const selectedMdFile = ref<MdFileData>({ content: '', id: 0, title: "", userOwnerId: "" })
-const { mdFileList } = useGetMdFile(store.userData!.user.id)
+const selectedMdFile = ref<MdFileData>({ content: '', id: 0, title: '', user_owner_id: '' })
+const { mdFileList, getMdFile } = useGetMdFile(store.userData!.user.id)
 
 async function callLogout() {
   try {
@@ -22,9 +25,31 @@ async function callLogout() {
     return router.push('/')
   }
 }
+
+async function createNewMdFile() {
+  try {
+    showSpinner.value = true
+    await useCreateNewMdFileSupabase({
+      title: newMdTitle.value,
+      content: '',
+      user_owner_id: store.userData!.user.id,
+      extra: '',
+      id: 0,
+    })
+    showCreateModal.value = false
+    newMdTitle.value = 'Nuova nota'
+    getMdFile(store.userData!.user.id)
+    showSpinner.value = false
+    Toast.open({ type: 'is-success', message: `Vabbe`, position: 'is-bottom' })
+  } catch (e) {
+    showSpinner.value = false
+    Toast.open({ type: 'is-danger', message: `E successo qualcosa... ${e}`, position: 'is-bottom' })
+  }
+}
 </script>
 
 <template>
+  <b-loading is-full-page v-model="showSpinner" />
   <main class="main-container">
     <aside class="drawer">
       <div class="buttons-column" v-if="mdFileList.length">
@@ -40,8 +65,7 @@ async function callLogout() {
         </b-tooltip>
       </div>
 
-      <div
-      class="buttons-column">
+      <div class="buttons-column">
         <b-tooltip label="Crear una nota nueva" position="is-right">
           <b-button type="is-dark" @click="showCreateModal = true">
             <b-icon type="is-success" icon="plus"></b-icon>
@@ -74,7 +98,7 @@ async function callLogout() {
             <b-field label="Titulo">
               <b-input type="text" :model-value="newMdTitle"> </b-input>
             </b-field>
-            <b-button class="w-full" type="is-primary">Vabbe</b-button>
+            <b-button class="w-full" @click="createNewMdFile" type="is-primary">Vabbe</b-button>
           </section>
         </div>
       </template>
@@ -96,7 +120,7 @@ async function callLogout() {
     gap: 12px;
     padding: 12px;
     border-right: #48c78e solid 1px;
-    .buttons-column{
+    .buttons-column {
       display: flex;
       flex-direction: column;
       gap: 12px;
