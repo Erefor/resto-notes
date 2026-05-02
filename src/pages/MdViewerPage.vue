@@ -31,7 +31,7 @@ async function createNewMdFile() {
     showSpinner.value = true
     await useCreateNewMdFileSupabase({
       title: newMdTitle.value,
-      content: '',
+      content: "",
       user_owner_id: store.userData!.user.id,
       extra: '',
       id: 0,

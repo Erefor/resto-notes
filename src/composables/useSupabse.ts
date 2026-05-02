@@ -38,7 +38,6 @@ export function useGetMdFile(userId: string) {
     try {
       const { data, error } = await supabase.from('md').select('*').eq('user_owner_id', userId)
       const response: MdFileData[] = data as MdFileData[]
-      console.log(response)
       mdFileList.value = [...response]
     } catch (e) {
       console.log(e)
@@ -49,14 +48,12 @@ export function useGetMdFile(userId: string) {
 }
 
 export async function useUpdateMdFile(newMdContentValue: string, mdFileId: number) {
-  console.log(newMdContentValue)
   const { data, error } = await supabase
     .from('md')
     .update({ content: newMdContentValue })
     .eq('id', mdFileId)
     .select('*')
   if (error) return Promise.reject(error.message)
-  console.log('updated mdFileId', mdFileId)
   return Promise.resolve()
 }
 

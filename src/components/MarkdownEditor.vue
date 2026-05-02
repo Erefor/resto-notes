@@ -21,7 +21,10 @@ const update = debounce(() => {
   useUpdateMdFile(mdFileData.value!.content, mdFileData.value!.id)
 }, 1000)
 
-watch(() => props.selectedMdFile, () => (mdFileData.value = props.selectedMdFile))
+watch(
+  () => props.selectedMdFile,
+  () => (mdFileData.value = props.selectedMdFile),
+)
 </script>
 
 <template>
@@ -33,11 +36,18 @@ watch(() => props.selectedMdFile, () => (mdFileData.value = props.selectedMdFile
       v-model="mdFileData!.content"
     />
     <div v-if="mdFileData" class="markdown"><VueMarkdownIt :source="mdFileData.content" /></div>
-    <b-tooltip position="is-left" class="float-button" :label="computedFloatButtonText">
-      <b-button @click="showEditor = !showEditor" rounded type="is-dark">
-        <b-icon type="is-success" icon="eye"></b-icon>
-      </b-button>
-    </b-tooltip>
+    <div class="floating-buttons-container">
+      <b-tooltip position="is-left" class="float-button" :label="computedFloatButtonText">
+        <b-button size="is-medium" @click="showEditor = !showEditor" rounded type="is-dark">
+          <b-icon type="is-success" icon="eye"></b-icon>
+        </b-button>
+      </b-tooltip>
+      <b-tooltip position="is-left" class="float-button" label="Elimina nota">
+        <b-button @click="showEditor = !showEditor" rounded type="is-dark">
+          <b-icon type="is-danger" icon="delete"></b-icon>
+        </b-button>
+      </b-tooltip>
+    </div>
   </div>
 </template>
 
@@ -60,11 +70,14 @@ watch(() => props.selectedMdFile, () => (mdFileData.value = props.selectedMdFile
     padding: 12px;
     width: v-bind(markdownWidth);
   }
-  .float-button {
+  .floating-buttons-container {
     position: absolute;
     bottom: 24px;
     right: 24px;
-    color: white;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 12px;
   }
 }
 </style>

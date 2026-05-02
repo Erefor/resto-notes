@@ -26,7 +26,6 @@ router.beforeEach((to, from, next) => {
   const isLoggedIn = userStore.getUserIsLogged
   const requiresAuth = to.matched.some((record) => record.meta.requireAuth)
   if (requiresAuth && !isLoggedIn) {
-    console.log('requiresAuth', requiresAuth)
      next({ name: 'Login' })
   } else if (to.name === 'Login' && isLoggedIn) {
     next({ name: 'MdFileViewer' })
