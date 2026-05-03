@@ -57,19 +57,8 @@ export async function useUpdateMdFile(newMdContentValue: string, mdFileId: numbe
   return Promise.resolve()
 }
 
-export function debounce<T extends (...args: any[]) => any>(
-  func: T,
-  delay: number,
-): (...args: Parameters<T>) => void {
-  let timeoutId: ReturnType<typeof setTimeout> | null
-
-  return function (this: ThisParameterType<T>, ...args: Parameters<T>) {
-    if (timeoutId) {
-      clearTimeout(timeoutId)
-    }
-    timeoutId = setTimeout(() => {
-      func.apply(this, args)
-      timeoutId = null
-    }, delay)
-  }
+export async function useDeleteMdFile(mdFileId: number) {
+  const { data, error } = await supabase.from('md').delete().eq('id', mdFileId).select('*')
+  if (error) return Promise.reject(error.message)
+  return Promise.resolve()
 }

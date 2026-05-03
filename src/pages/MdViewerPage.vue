@@ -12,7 +12,13 @@ const store = authStore()
 const showSpinner = ref<boolean>(false)
 const showCreateModal = ref<boolean>(false)
 const newMdTitle = ref<string>('Nuova nota')
-const selectedMdFile = ref<MdFileData>({ content: '', id: 0, title: '', user_owner_id: '' })
+const selectedMdFile = ref<MdFileData>({
+  content: '',
+  id: 0,
+  title: '',
+  user_owner_id: '',
+  extra: '',
+})
 const { mdFileList, getMdFile } = useGetMdFile(store.userData!.user.id)
 
 async function callLogout() {
@@ -31,7 +37,7 @@ async function createNewMdFile() {
     showSpinner.value = true
     await useCreateNewMdFileSupabase({
       title: newMdTitle.value,
-      content: "",
+      content: '',
       user_owner_id: store.userData!.user.id,
       extra: '',
       id: 0,
@@ -44,6 +50,16 @@ async function createNewMdFile() {
   } catch (e) {
     showSpinner.value = false
     Toast.open({ type: 'is-danger', message: `E successo qualcosa... ${e}`, position: 'is-bottom' })
+  }
+}
+
+function reset() {
+  selectedMdFile.value = {
+    content: '',
+    id: 0,
+    title: '',
+    user_owner_id: '',
+    extra: '',
   }
 }
 </script>
@@ -79,7 +95,7 @@ async function createNewMdFile() {
       </div>
     </aside>
     <div class="content">
-      <MarkdownEditor :selectedMdFile="selectedMdFile" />
+      <MarkdownEditor @deleteSuccess="reset" :selectedMdFile="selectedMdFile" />
     </div>
 
     <b-modal
