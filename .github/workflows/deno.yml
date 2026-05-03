@@ -1,0 +1,39 @@
+name: Build and Deploy (SCP)
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch: {}
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+      - name: Remove lock.json
+        run: rm package-lock.json
+
+      - name: Install dependencies
+        run: npm install --force
+
+      - name: Build
+        run: npm run build-only
+
+      # =========================
+      # DEPLOY POR SCP
+      # =========================
+      - name: Copy dist to server via SCP
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: 64.227.5.207 
+          username: "bury"
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "dist"
+          target: "/var/www/md-file/"
