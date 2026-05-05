@@ -24,6 +24,7 @@ export async function logoutUser() {
 
 export async function useCreateNewMdFileSupabase(newMdFileData: MdFileData) {
   const {id, ...rest} = newMdFileData
+  console.log(rest)
   const { data, error } = await supabase
     .from('md')
     .insert([rest])

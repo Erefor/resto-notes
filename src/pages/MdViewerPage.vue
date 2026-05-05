@@ -42,9 +42,9 @@ async function createNewMdFile() {
       extra: '',
       id: 0,
     })
-    showCreateModal.value = false
     newMdTitle.value = 'Nuova nota'
-    getMdFile(store.userData!.user.id)
+    await getMdFile(store.userData!.user.id)
+    showCreateModal.value = false
     showSpinner.value = false
     Toast.open({ type: 'is-success', message: `Vabbe`, position: 'is-bottom' })
   } catch (e) {
@@ -61,6 +61,7 @@ function reset() {
     user_owner_id: '',
     extra: '',
   }
+  getMdFile(store.userData!.user.id)
 }
 </script>
 
@@ -76,7 +77,10 @@ function reset() {
           position="is-right"
         >
           <b-button type="is-dark" @click="selectedMdFile = data">
-            <b-icon type="is-success" icon="book"></b-icon>
+            <b-icon
+              :type="selectedMdFile.id === data.id ? 'is-white' : 'is-success'"
+              icon="book"
+            ></b-icon>
           </b-button>
         </b-tooltip>
       </div>
@@ -112,7 +116,7 @@ function reset() {
         <div class="modal-card" style="width: auto">
           <section class="modal-card-body grid">
             <b-field label="Titulo">
-              <b-input type="text" :model-value="newMdTitle"> </b-input>
+              <b-input type="text" v-model="newMdTitle"> </b-input>
             </b-field>
             <b-button class="w-full" @click="createNewMdFile" type="is-primary">Vabbe</b-button>
           </section>

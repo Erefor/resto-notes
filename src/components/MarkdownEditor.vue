@@ -7,7 +7,7 @@ import debounce from 'buefy/src/utils/debounce.ts'
 import { useDeleteMdFile, useUpdateMdFile } from '@/composables/useSupabse.ts'
 import RestoModal from '@/components/RestoModal.vue'
 
-defineEmits(['update:modelValue', 'deleteSuccess'])
+const emit = defineEmits(['update:modelValue', 'deleteSuccess'])
 const props = defineProps<{ selectedMdFile: MdFileData }>()
 
 const Toast = useToast()
@@ -26,8 +26,10 @@ async function dispatchDeleteMdFile() {
     showSpinner.value = true
     await useDeleteMdFile(mdFileData.value!.id)
     showEditor.value = false
-    Toast.open({ type: 'is-success', message: `Vabbe`, position: 'is-bottom' })
     showSpinner.value = false
+    showDeleteNoteModal.value = false
+    emit('deleteSuccess')
+    Toast.open({ type: 'is-success', message: `Vabbe`, position: 'is-bottom' })
   } catch (e) {
     Toast.open({ type: 'is-success', message: `Vabbe`, position: 'is-bottom' })
     showEditor.value = false
@@ -57,8 +59,8 @@ watch(
       class="markdown-editor"
       v-model="mdFileData!.content"
     />
-    <div v-if="mdFileData" class="markdown"><VueMarkdownIt :source="mdFileData.content" /></div>
-    <div v-if="mdFileData" class="floating-buttons-container">
+    <div v-if="mdFileData?.id" class="markdown"><VueMarkdownIt :source="mdFileData.content" /></div>
+    <div v-if="mdFileData?.id" class="floating-buttons-container">
       <b-tooltip position="is-left" class="float-button" :label="computedFloatButtonText">
         <b-button size="is-medium" @click="showEditor = !showEditor" rounded type="is-dark">
           <b-icon type="is-success" icon="eye"></b-icon>
@@ -81,9 +83,10 @@ watch(
 <style scoped>
 .markdown-container {
   width: 100%;
-  height: 100%;
+  height: 100vh;
   display: flex;
   position: relative;
+  overflow: hidden;
   .markdown-editor {
     width: 50%;
     background-color: transparent;
@@ -96,6 +99,9 @@ watch(
   .markdown {
     padding: 12px;
     width: v-bind(markdownWidth);
+    max-width: 100%;
+    overflow-x: auto;
+    word-wrap: break-word;
   }
   .floating-buttons-container {
     position: fixed;
