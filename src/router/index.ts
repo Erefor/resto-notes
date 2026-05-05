@@ -3,34 +3,41 @@ import LoginView from '@/pages/LoginView.vue'
 import MdViewerPage from '@/pages/MdViewerPage.vue'
 import authStore from '@/stores/userStore.ts'
 
+export const ROUTES_DATA = {
+  LOGIN: {
+    NAME: 'Login',
+    path: '/',
+  },
+  MD_FILE_VIEWER: {
+    NAME: 'MdFileViewer',
+    path: '/mdFileViewer/:mdFileId?',
+  },
+}
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: '/',
-      name: 'Login',
+      path: ROUTES_DATA.LOGIN.path,
+      name: ROUTES_DATA.LOGIN.NAME,
       component: LoginView,
       meta: { requireAuth: false },
     },
     {
-      path: '/md-file-viewer/:mdFileId?',
-      name: 'MdFileViewer',
+      path: ROUTES_DATA.MD_FILE_VIEWER.path,
+      name: ROUTES_DATA.MD_FILE_VIEWER.NAME,
       component: MdViewerPage,
       meta: { requireAuth: true },
     },
   ],
 })
 
-router.beforeEach((to, from, next) => {
+router.beforeEach((to) => {
   const userStore = authStore()
   const isLoggedIn = userStore.getUserIsLogged
-  const requiresAuth = to.matched.some((record) => record.meta.requireAuth)
-  if (requiresAuth && !isLoggedIn) {
-     next({ name: 'Login' })
-  } else if (to.name === 'Login' && isLoggedIn) {
-    next({ name: 'MdFileViewer' })
+  if (!isLoggedIn && to.name !== ROUTES_DATA.LOGIN.NAME) {
+    return {name: ROUTES_DATA.LOGIN.NAME}
   }
-  return next();
 })
 
 export default router

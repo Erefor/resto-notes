@@ -4,7 +4,8 @@ import { singUpUser } from '@/composables/useSupabse.ts'
 import { useToast } from 'buefy'
 import router from '@/router'
 import authStore from '@/stores/userStore.ts'
-
+import { ROUTES_DATA } from '@/router'
+import type { AuthData } from '@/types.ts'
 
 const Toast = useToast()
 const showSpinner = ref(false)
@@ -18,9 +19,9 @@ async function login() {
   try {
     showSpinner.value = true
     const response = await singUpUser(loginData.value)
-    userStore.setLoginData(response)
+    userStore.setLoginData(response as AuthData)
     showSpinner.value = false
-    router.push('/md-file-viewer')
+    router.push({name: ROUTES_DATA.MD_FILE_VIEWER.NAME})
   } catch (e) {
     showSpinner.value = false
     Toast.open({ type: 'is-danger', message: 'Vaffanculo, fra...', position: 'is-bottom' })

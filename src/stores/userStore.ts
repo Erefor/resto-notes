@@ -13,7 +13,7 @@ export const authStore = defineStore('auth', () => {
 
   function setLoginData(payload: AuthData) {
     userData!.value = structuredClone(payload)
-    token.value = payload.access_token
+    token.value = payload.session.access_token
     localStorage.setItem('token', token.value)
     localStorage.setItem('user-data', JSON.stringify(payload))
   }
