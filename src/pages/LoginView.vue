@@ -16,6 +16,10 @@ const loginData = ref({
 })
 
 async function login() {
+  if (!loginData.value.email || !loginData.value.password) {
+    Toast.open({ type: 'is-danger', message: 'Compila tutti i campi, fra...', position: 'is-bottom' })
+    return
+  }
   try {
     showSpinner.value = true
     const response = await singUpUser(loginData.value)
@@ -33,17 +37,17 @@ async function login() {
   <b-loading is-full-page v-model="showSpinner" />
   <div class="login-main-container">
     <div class="card">
-      <div class="card-content">
+      <form class="card-content">
         <div class="content grid">
           <b-field label="Email">
-            <b-input type="text" v-model="loginData.email" />
+            <b-input type="email" v-model="loginData.email" />
           </b-field>
           <b-field label="Password">
-            <b-input type="password" v-model="loginData.password" />
+            <b-input type="password" v-model="loginData.password" @keydown.enter="login" />
           </b-field>
           <b-button type="is-primary" outlined @click="login">Dai</b-button>
         </div>
-      </div>
+      </form>
     </div>
   </div>
 </template>
